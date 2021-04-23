@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
 import { FlatList } from "react-native-gesture-handler";
+import { useNavigation } from "@react-navigation/core";
 
 import { EnvironmentButton } from "../components/EnvironmentButton";
 import { Header } from "../components/Header";
@@ -12,22 +13,19 @@ import api from "../services/api";
 import colors from "../styles/colors";
 import fonts from "../styles/fonts";
 
+import { PlantProps } from "../libs/storage";
+
 interface EnvironmentProps {
   key: string;
   title: string;
 }
 
-interface PlantsProps {
-  id: number;
-  name: string;
-  photo: string;
-  environments: [string];
-}
-
 export function PlantSelect() {
+  const navigation = useNavigation();
+
   const [environments, setEnvironments] = useState<EnvironmentProps[]>([]);
-  const [plants, setPlants] = useState<PlantsProps[]>([]);
-  const [filteredPlants, setFilteredPlants] = useState<PlantsProps[]>([]);
+  const [plants, setPlants] = useState<PlantProps[]>([]);
+  const [filteredPlants, setFilteredPlants] = useState<PlantProps[]>([]);
   const [environmentSelected, setEnvironmentSelected] = useState("all");
   const [loading, setLoading] = useState(true);
 
@@ -73,6 +71,10 @@ export function PlantSelect() {
 
     setLoading(false);
     setLoadingMore(false);
+  }
+
+  function handlePlantSelect(plant: PlantProps) {
+    navigation.navigate("PlantSave", { plant });
   }
 
   useEffect(() => {
@@ -125,7 +127,11 @@ export function PlantSelect() {
           onEndReachedThreshold={0.1}
           onEndReached={({ distanceFromEnd }) => loadMore(distanceFromEnd)}
           renderItem={({ item, index }) => (
-            <PlantCard left={index % 2} data={item} />
+            <PlantCard
+              left={index % 2}
+              data={item}
+              onPress={() => handlePlantSelect(item)}
+            />
           )}
           ListFooterComponent={
             loadingMore && !loadedAll ? (

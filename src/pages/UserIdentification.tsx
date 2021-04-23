@@ -21,6 +21,7 @@ import fonts from "../styles/fonts";
 
 export function UserIdentification() {
   const navigation = useNavigation();
+
   const [isFocused, setIsFocused] = useState(false);
   const [isFilled, setIsFilled] = useState(false);
   const [name, setName] = useState<string>();
@@ -34,9 +35,17 @@ export function UserIdentification() {
       );
     }
 
-    await AsyncStorage.setItem("@plantmanager:user_name", name);
+    try {
+      await AsyncStorage.setItem("@plantmanager:user_name", name);
 
-    navigation.navigate("Confirmation");
+      navigation.navigate("Confirmation");
+    } catch (e) {
+      return ToastAndroid.showWithGravity(
+        `Algo deu errado 😥, tente novamente`,
+        ToastAndroid.SHORT,
+        ToastAndroid.TOP
+      );
+    }
   }
 
   function handleInputBlur() {
