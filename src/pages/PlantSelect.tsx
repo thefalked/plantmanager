@@ -103,11 +103,11 @@ export function PlantSelect() {
         <View style={styles.environmentList}>
           <FlatList
             data={environments}
+            keyExtractor={(item) => String(item.key)}
             horizontal
             showsHorizontalScrollIndicator={false}
             renderItem={({ item }) => (
               <EnvironmentButton
-                key={item.key}
                 title={item.title}
                 active={item.key === environmentSelected}
                 onPress={() => handleEnvironmentSelected(item)}
@@ -119,12 +119,13 @@ export function PlantSelect() {
       <View style={styles.plantsList}>
         <FlatList
           data={filteredPlants}
+          keyExtractor={(item) => String(item.id)}
           numColumns={2}
           showsVerticalScrollIndicator={false}
           onEndReachedThreshold={0.1}
           onEndReached={({ distanceFromEnd }) => loadMore(distanceFromEnd)}
           renderItem={({ item, index }) => (
-            <PlantCard key={item.id} left={index % 2} data={item} />
+            <PlantCard left={index % 2} data={item} />
           )}
           ListFooterComponent={
             loadingMore && !loadedAll ? (

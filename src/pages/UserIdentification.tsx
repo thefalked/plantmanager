@@ -9,9 +9,13 @@ import {
   TextInput,
   View,
   Keyboard,
+  ToastAndroid,
 } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
 import { useNavigation } from "@react-navigation/core";
 import { Button } from "../components/Button";
+
 import colors from "../styles/colors";
 import fonts from "../styles/fonts";
 
@@ -21,8 +25,18 @@ export function UserIdentification() {
   const [isFilled, setIsFilled] = useState(false);
   const [name, setName] = useState<string>();
 
-  function handleSubmit() {
-    !!name && navigation.navigate("Confirmation");
+  async function handleSubmit() {
+    if (!name) {
+      return ToastAndroid.showWithGravity(
+        "Me diz como posso te chamar 😥",
+        ToastAndroid.SHORT,
+        ToastAndroid.TOP
+      );
+    }
+
+    await AsyncStorage.setItem("@plantmanager:user_name", name);
+
+    navigation.navigate("Confirmation");
   }
 
   function handleInputBlur() {
