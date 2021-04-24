@@ -1,5 +1,13 @@
 import React, { useEffect, useState } from "react";
-import { FlatList, Image, StyleSheet, Text, View } from "react-native";
+import {
+  Alert,
+  FlatList,
+  Image,
+  StyleSheet,
+  Text,
+  ToastAndroid,
+  View,
+} from "react-native";
 import { formatDistance } from "date-fns/esm";
 import { pt } from "date-fns/locale";
 
@@ -7,17 +15,50 @@ import { Header } from "../components/Header";
 import { Load } from "../components/Load";
 import { TimePlantCard } from "../components/TimePlantCard";
 
-import { loadPlants, PlantProps } from "../libs/storage";
+import {
+  loadPlants,
+  PlantProps,
+  removePlant,
+  StoragePlantProps,
+} from "../libs/storage";
 
 import colors from "../styles/colors";
 import fonts from "../styles/fonts";
 
 import waterdropImg from "../assets/waterdrop.png";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export function MyPlants() {
   const [myPlants, setMyPlants] = useState<PlantProps[]>([]);
   const [loading, setLoading] = useState(true);
   const [nextWaterd, setNextWaterd] = useState<string>();
+
+  function handleRemove(plant: PlantProps) {
+    Alert.alert("Remover", `Deseja remover a ${plant.name}?`, [
+      {
+        text: "Não 🙏🏼",
+        style: "cancel",
+      },
+      {
+        text: "Sim 😥",
+        onPress: async () => {
+          try {
+            await removePlant(plant.id);
+
+            setMyPlants((oldData) =>
+              oldData.filter((item) => item.id !== plant.id)
+            );
+          } catch (error) {
+            return ToastAndroid.showWithGravity(
+              "Não foi possível remover 😥, tente novamente",
+              ToastAndroid.SHORT,
+              ToastAndroid.BOTTOM
+            );
+          }
+        },
+      },
+    ]);
+  }
 
   useEffect(() => {
     async function loadStorageData() {
@@ -55,7 +96,12 @@ export function MyPlants() {
           <FlatList
             data={myPlants}
             keyExtractor={(item) => String(item.id)}
-            renderItem={({ item }) => <TimePlantCard data={item} />}
+            renderItem={({ item }) => (
+              <TimePlantCard
+                data={item}
+                handleRemove={() => handleRemove(item)}
+              />
+            )}
             showsVerticalScrollIndicator={false}
           />
         </View>
