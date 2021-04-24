@@ -9,23 +9,27 @@ import {
   View,
 } from "react-native";
 import { SvgFromUri } from "react-native-svg";
-import { useRoute } from "@react-navigation/core";
+import { useNavigation, useRoute } from "@react-navigation/core";
 import DateTimePicker, { Event } from "@react-native-community/datetimepicker";
 import { format, isBefore } from "date-fns";
 import { getStatusBarHeight } from "react-native-iphone-x-helper";
+
+import { Button } from "../components/Button";
+
+import { PlantProps, savePlant } from "../libs/storage";
 
 import colors from "../styles/colors";
 import fonts from "../styles/fonts";
 
 import waterdropImg from "../assets/waterdrop.png";
-import { Button } from "../components/Button";
-import { PlantProps, savePlant } from "../libs/storage";
 
 interface Params {
   plant: PlantProps;
 }
 
 export function PlantSave() {
+  const navigation = useNavigation();
+
   const route = useRoute();
   const { plant } = route.params as Params;
 
@@ -56,6 +60,16 @@ export function PlantSave() {
   async function handleSavePlant() {
     try {
       await savePlant({ ...plant, dateTimeNotification: selectedDatetime });
+
+      navigation.navigate("Confirmation", {
+        title: "Tudo certo",
+        subtitle: `Fique tranquilo que sempre vamos
+        lembrar você de cuidar da sua plantinha
+        com bastante amor.`,
+        icon: "hug",
+        buttonTitle: "Muito obrigado :D",
+        nextScreen: "MyPlants",
+      });
     } catch (error) {
       return ToastAndroid.showWithGravity(
         "Não foi possível salver 😥, tente novamente",
@@ -107,7 +121,7 @@ export function PlantSave() {
         <Button
           title="Cadastrar Planta"
           style={styles.savePlant}
-          onPress={() => handleSavePlant}
+          onPress={handleSavePlant}
         />
       </View>
     </View>

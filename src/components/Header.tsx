@@ -1,30 +1,23 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { Text, StyleSheet, View, Image } from "react-native";
 import { getStatusBarHeight } from "react-native-iphone-x-helper";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import colors from "../styles/colors";
 import fonts from "../styles/fonts";
 
 import userImg from "../assets/thefalked.jpg";
 
-export function Header() {
-  const [userName, setUserName] = useState<string>();
-  useEffect(() => {
-    async function getUserName() {
-      const name = await AsyncStorage.getItem("@plantmanager:user_name");
+interface HeaderProps {
+  title: string;
+  subtitle: string;
+}
 
-      setUserName(name || "Amiguinho");
-    }
-
-    getUserName();
-  }, []);
-
+export function Header({ title, subtitle }: HeaderProps) {
   return (
     <View style={styles.container}>
       <View>
-        <Text style={styles.greeting}>Olá,</Text>
-        <Text style={styles.name}>{userName}</Text>
+        <Text style={styles.greeting}>{title}</Text>
+        <Text style={styles.name}>{subtitle}</Text>
       </View>
       <Image style={styles.photo} source={userImg} />
     </View>
@@ -37,7 +30,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    paddingVertical: 20,
+    paddingVertical: 40,
     paddingHorizontal: 32,
     marginTop: getStatusBarHeight(),
   },

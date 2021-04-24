@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
 import { FlatList } from "react-native-gesture-handler";
 import { useNavigation } from "@react-navigation/core";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import { EnvironmentButton } from "../components/EnvironmentButton";
 import { Header } from "../components/Header";
@@ -10,10 +11,10 @@ import { Load } from "../components/Load";
 
 import api from "../services/api";
 
+import { PlantProps } from "../libs/storage";
+
 import colors from "../styles/colors";
 import fonts from "../styles/fonts";
-
-import { PlantProps } from "../libs/storage";
 
 interface EnvironmentProps {
   key: string;
@@ -22,6 +23,8 @@ interface EnvironmentProps {
 
 export function PlantSelect() {
   const navigation = useNavigation();
+
+  const [userName, setUserName] = useState("");
 
   const [environments, setEnvironments] = useState<EnvironmentProps[]>([]);
   const [plants, setPlants] = useState<PlantProps[]>([]);
@@ -86,7 +89,14 @@ export function PlantSelect() {
       setEnvironments([{ key: "all", title: "Todos" }, ...data]);
     }
 
+    async function getUserName() {
+      const name = await AsyncStorage.getItem("@plantmanager:user_name");
+
+      setUserName(name || "Amiguinho");
+    }
+
     getEnviroment();
+    getUserName();
     getPlants();
   }, []);
 
@@ -94,7 +104,7 @@ export function PlantSelect() {
 
   return (
     <View style={styles.container}>
-      <Header />
+      <Header title="Olá," subtitle={userName} />
 
       <View style={styles.wrapper}>
         <View style={styles.heading}>
@@ -155,7 +165,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 32,
   },
   heading: {
-    marginTop: 30,
+    marginBottom: 24,
   },
   title: {
     fontSize: 17,
@@ -171,11 +181,9 @@ const styles = StyleSheet.create({
   },
   environmentList: {
     height: 40,
-    marginTop: 24,
   },
   plantsList: {
     flex: 1,
-    marginBottom: 40 - 16,
     marginTop: 40,
     paddingHorizontal: 32,
     justifyContent: "center",

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
   Text,
   SafeAreaView,
@@ -11,10 +11,12 @@ import {
 
 import { Feather } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/core";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
-import wateringImg from "../assets/watering.png";
 import colors from "../styles/colors";
 import fonts from "../styles/fonts";
+
+import wateringImg from "../assets/watering.png";
 
 export function Welcome() {
   const navigation = useNavigation();
@@ -22,6 +24,16 @@ export function Welcome() {
   function handleStart() {
     navigation.navigate("UserIdentification");
   }
+
+  useEffect(() => {
+    async function getUserName() {
+      const name = await AsyncStorage.getItem("@plantmanager:user_name");
+
+      if (name) return navigation.navigate("PlantSelect");
+    }
+
+    getUserName();
+  }, []);
 
   return (
     <SafeAreaView style={styles.container}>
